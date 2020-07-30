@@ -1,8 +1,7 @@
 from selenium import webdriver
 import time
 import json
-
-FILE_NAME = "C:\\Users\\RealMe\\PycharmProjects\\codes\\ripie.json"
+FILE_NAME = file_path
 def save(x):
     with open(FILE_NAME,'w') as f:
         json.dump(x,f)
