@@ -3,7 +3,7 @@ import time
 import json
 
 
-FILE_NAME = 'C:\\Users\\RealMe\\PycharmProjects\\codes\\storyweaverstoriesmarathi.json'
+FILE_NAME = FILE_PATH
 
 def save(x):
     with open(FILE_NAME,'w') as f:
