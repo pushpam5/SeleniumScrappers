@@ -1,69 +1,104 @@
 from selenium import webdriver
 import time
 import json
-FILE_NAME = file_path
+import re
+from selenium.webdriver.support.ui import Select
 
+FILE_NAME = FILE_PATH
+phone = []
+fax = []
+email = []
+address = []
+city = []
+zip = []
+country = []
+activity = []
+membership = []
+type = []
+website = []
+name = []
+org_level = []
+typeco = []
+member = []
+wango = []
 
+with open(FILE_NAME,'w') as f:
+    a = []
+    json.dump(a,f)
 def save(x):
     with open(FILE_NAME,'w') as f:
         json.dump(x,f)
-organisation = []
-address = []
-details = []
 pause_time = 3
 val = 2
 DRIVER_PATH = 'chromedriver.exe'
 driver = webdriver.Chrome(executable_path=DRIVER_PATH)
-driver.get('https://www.wango.org/resources.aspx?section=ngodir&sub=list&regionID=0&col=')
-loaddata = '/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr/td[1]/a[1]'
-while True and val < 200:
+driver.get('https://www.wango.org/members.aspx')
+username = driver.find_element_by_name('username')
+password = driver.find_element_by_name('password')
+button = driver.find_element_by_name('login')
+username.send_keys(username)
+password.send_keys(password)
+button.click()
+driver.get('https://www.wango.org/members.aspx?section=ngodir')
+p = driver.find_element_by_class_name("postActive")
+p.click()
 
-    time.sleep(pause_time)
-    try:
-        add = driver.find_element_by_xpath('/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr/td[1]/div[3]/div[1]')
-        print(add.text)
-        address.append(add.text)
-    except Exception as e:
-        address.append("Not Found")
-    try:
-        h = driver.find_element_by_xpath(loaddata)
-        h.click()
-    except:
-        break
-    try:
-        org = driver.find_element_by_xpath('/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr/td[1]/a[1]/b')
-        print(org.text)
-        organisation.append(org.text)
-    except Exception as e:
-        organisation.append("Not Found")
-    try:
-        det = driver.find_element_by_xpath('/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr/td[1]/div[4]/div/table/tbody/tr[1]/td/div')
-        print(det.text)
-        details.append(det.text)
-    except Exception as e:
-        details.append("Not Found")
-    try:
-        print(f"javascript:goPage('{val}',  '', 'zz');void(0);")
-        link = driver.find_elements_by_tag_name('a')
-        for j in  link:
-            if j.get_attribute('href') == f"javascript:goPage('{val}',  '', 'zz');void(0);":
-                next_button = j
-        next_button.click()
-        val += 1
-    except Exception as e:
-        val+= 1
-print(address)
-print(organisation)
+sel = Select(driver.find_element_by_name("search_regionID"))
+sel.select_by_value('15')
 
-final_list = []
-length = len(address)
-print(val)
-for j in range(length):
-    dict = {}
-    dict['address'] = address[j]
-    dict['organisation'] = organisation[j]
-    dict['details'] = details[j]
-    final_list.append(dict)
-print(final_list)
-save(final_list)
-
+sel = Select(driver.find_element_by_name("search_country"))
+sel.select_by_value('Morocco')
+but = driver.find_element_by_name('submitbutton')
+but.click()
+links = []
+ids = []
+k = 1
+leng = NUMBER_OF_PAGES
+while k <= leng:
+    links = []
+    ids = []
+    if k != 1:
+        j = driver.find_elements_by_tag_name('a')
+        for i in j:
+            s = f"javascript:goPage('{k}',  '', 'zz');void(0);"
+            print(i.get_attribute('href'),f"javascript:goPage('{k}',  '', 'zz');void(0);")
+            if str(i.get_attribute('href')) == str(f"javascript:goPage('{k}',  '', 'zz');void(0);"):
+                i.click()
+                break
+    p = driver.find_elements_by_tag_name('a')
+    name = []
+    for i in p:
+        if 'javascript:loadOrg' in i.get_attribute('href'):
+            name.append(i.text)
+            links.append(i)
+    print(name)
+    time.sleep(1)
+    for i in links:
+        ids.append(''.join(re.findall(r'\d+',str(i.get_attribute('href')))))
+    print(ids)
+    count = 0
+    tot = 0
+    for i in links:
+        i.click()
+        print(f'd{ids[tot]}')
+        p = driver.find_element_by_id(f'd{ids[tot]}')
+        q = p.find_elements_by_class_name('tdbgray')
+        length = len(q)
+        l = []
+        s = "name : "
+        s += name[tot]
+        l.append(s)
+        for i in range(length):
+            if i & 1 == 0:
+                s = q[i].text
+                print(s)
+            else:
+                s += f' : {q[i].text} '
+                print(s)
+                l.append(s)
+        with open(FILE_NAME) as file:
+            data = json.load(file)
+            data.append(l)
+            save(data)
+        tot += 1
+    k += 1
