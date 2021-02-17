@@ -6,7 +6,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 import pycountry
 
-FILE_NAME = 'C:\\Users\\RealMe\\PycharmProjects\\codes\\rmhc1.json'
+FILE_NAME = file_path
 with open(FILE_NAME,'w') as f:
     a = []
     json.dump(a,f)
